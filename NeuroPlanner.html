@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NeuroPlanner - AI-Driven Study System</title>
+  <style>
+    :root {
+      --neon-blue: #00f3ff;
+      --cyber-purple: #bc13fe;
+      --hud-green: #39ff14;
+      --deep-black: #050505;
+      --soft-glow: rgba(0, 243, 255, 0.15);
+    }
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--deep-black);
+      color: var(--neon-blue);
+      margin: 0;
+      overflow-x: hidden;
+    }
+    .cyber-border {
+      border: 2px solid var(--cyber-purple);
+      position: relative;
+      background: linear-gradient(45deg, rgba(188,19,254,0.05), rgba(0,243,255,0.05));
+    }
+    .cyber-border::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px; right: -2px; bottom: -2px;
+      background: linear-gradient(45deg, var(--cyber-purple), var(--neon-blue));
+      z-index: -1;
+      filter: blur(8px);
+      opacity: 0.4;
+    }
+    .hud-display {
+      background: rgba(0, 0, 0, 0.92);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 40px var(--soft-glow);
+      backdrop-filter: blur(12px);
+    }
+    .neon-text {
+      text-shadow: 0 0 15px var(--neon-blue);
+    }
+    .cyber-input {
+      background: #101010;
+      border: 1px solid var(--cyber-purple);
+      color: var(--hud-green);
+      padding: 1rem;
+      margin-top: 0.5rem;
+      width: 100%;
+      font-size: 1rem;
+    }
+    .cyber-input:focus {
+      box-shadow: 0 0 15px var(--cyber-purple);
+      outline: none;
+    }
+    .neon-btn {
+      background: var(--cyber-purple);
+      border: none;
+      padding: 1rem 2rem;
+      color: white;
+      cursor: pointer;
+      margin-top: 1rem;
+      font-weight: bold;
+      transition: all 0.2s ease-in-out;
+    }
+    .neon-btn:hover {
+      background: #d65eff;
+      box-shadow: 0 0 10px var(--cyber-purple);
+    }
+    .study-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .neon-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .neon-table th, .neon-table td {
+      border: 1px solid var(--cyber-purple);
+      padding: 1rem;
+      text-align: center;
+      background-color: #111111;
+      color: var(--neon-blue);
+    }
+    .neon-table th {
+      background-color: #1a1a1a;
+    }
+    .ai-recommendation {
+      border-left: 3px solid var(--hud-green);
+      padding: 1rem;
+      margin: 1rem 0;
+      background-color: #0f0f0f;
+      color: var(--hud-green);
+    }
+  </style>
+</head>
+<body>
+  <div class="container hud-display cyber-border" style="margin: 2rem">
+    <h1 class="neon-text">🧠 NEUROPLANNER v1.0</h1>
+
+    <div class="study-grid">
+      <div>
+        <h2>📡 Input Protocol</h2>
+        <input type="text" id="subjectInput" class="cyber-input" placeholder="Subject Identifier"/>
+        <input type="date" id="examDate" class="cyber-input"/>
+        <button class="neon-btn" onclick="addSubject()">Initialize</button>
+      </div>
+      <div>
+        <h2>📊 AI Recommendation</h2>
+        <div class="ai-recommendation" id="aiTip">
+          Awaiting subject input...
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 2rem">
+      <h2>⏱ Temporal Schedule</h2>
+      <table class="neon-table">
+        <thead>
+          <tr>
+            <th>Week</th>
+            <th>Focus Area</th>
+            <th>Study Hours</th>
+            <th>Resources</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="timetableBody">
+          <!-- JS will populate -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function calculateWeeks(start, end) {
+      const oneWeek = 7 * 24 * 60 * 60 * 1000;
+      return Math.ceil((end - start) / oneWeek);
+    }
+
+    function generateSchedule(subject, weeks) {
+      let rows = '';
+      for (let i = 1; i <= weeks; i++) {
+        const hours = Math.round(10 + Math.random() * 5);
+        rows += `
+          <tr>
+            <td>Week ${i}</td>
+            <td>${subject} - Module ${i}</td>
+            <td>${hours} hrs</td>
+            <td><button class="neon-btn" onclick="alert('Downloading resources for Week ${i} 📦')">📁</button></td>
+            <td>🔄 Pending</td>
+          </tr>
+        `;
+      }
+      return rows;
+    }
+
+    function addSubject() {
+      const subject = document.getElementById('subjectInput').value.trim();
+      const examDateInput = document.getElementById('examDate').value;
+
+      if (!subject || !examDateInput) {
+        alert('⚠️ Please enter both subject and exam date.');
+        return;
+      }
+
+      const today = new Date();
+      const examDate = new Date(examDateInput);
+
+      if (examDate <= today) {
+        alert('⚠️ Exam date must be in the future.');
+        return;
+      }
+
+      const weeks = calculateWeeks(today, examDate);
+      const scheduleHTML = generateSchedule(subject, weeks);
+
+      document.getElementById('timetableBody').innerHTML = scheduleHTML;
+
+      document.getElementById('aiTip').innerHTML = `
+        <strong>Next 3 Weeks:</strong> Focus on core modules of <em>${subject}</em>.
+        <br>Recommended study time: 2 hrs/day.
+      `;
+    }
+  </script>
+</body>
+</html>
